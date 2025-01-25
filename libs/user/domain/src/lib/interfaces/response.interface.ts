@@ -11,7 +11,7 @@ export interface UserLoggedIn {
 }
 
 export type JWTContent = {
-  aud?: string;
+  aud: string;
   iss: string;
   sub: string;
   jti: string;

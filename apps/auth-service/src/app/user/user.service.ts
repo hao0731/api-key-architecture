@@ -1,13 +1,17 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { defer, map, Observable } from 'rxjs';
 import { compare } from 'bcrypt';
 import { CreateUser, User, UserLoggedIn } from '@todoapp/user/domain';
 import { UserRepository } from './user.repository';
 import { UserDocument } from './user.schema';
+import { TokenConfig, tokenConfig } from '../config';
 
 @Injectable()
 export class UserService {
-  constructor(private readonly userRepository: UserRepository) {}
+  constructor(
+    private readonly userRepository: UserRepository,
+    @Inject(tokenConfig.KEY) private readonly tokenConfig: TokenConfig
+  ) {}
 
   createUser(params: CreateUser) {
     return this.userRepository
@@ -24,19 +28,20 @@ export class UserService {
   }
 
   generateLoggedInInformation(user: User): UserLoggedIn {
-    const issuer = 'auth-service';
     const issueDate = new Date();
     const expireDate = new Date(new Date().setHours(new Date().getHours() + 1));
     return {
       access_token: {
-        iss: issuer,
+        iss: this.tokenConfig.issuer,
+        aud: this.tokenConfig.audience,
         sub: user.id,
         jti: crypto.randomUUID(),
         iat: issueDate.valueOf(),
         exp: expireDate.valueOf(),
       },
       refresh_token: {
-        iss: issuer,
+        iss: this.tokenConfig.issuer,
+        aud: this.tokenConfig.audience,
         sub: user.id,
         jti: crypto.randomUUID(),
         iat: issueDate.valueOf(),
