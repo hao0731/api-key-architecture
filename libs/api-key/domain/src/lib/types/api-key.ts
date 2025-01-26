@@ -3,6 +3,8 @@ import { RoleName } from '@todoapp/permission/domain';
 export type ApiKeyId = string;
 export type ApiKeyHint = string;
 
+export type RawApiKey = `${ApiKeyHint}${string}`;
+
 export type ApiKey = {
   id: ApiKeyId;
   keyHint: ApiKeyHint;
