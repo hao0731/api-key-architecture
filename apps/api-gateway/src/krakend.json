@@ -1,0 +1,30 @@
+{
+  "$schema": "https://www.krakend.io/schema/v2.9/krakend.json",
+  "version": 3,
+  "endpoints": [
+    {
+      "endpoint": "/users/login",
+      "method": "POST",
+      "backend": [
+        {
+          "url_pattern": "/api/users/login",
+          "host": ["http://auth-service:3333"],
+          "method": "POST"
+        }
+      ],
+      "extra_config": {
+        "auth/signer": {
+          "alg": "RS256",
+          "jwk_local_path": "./assets/jwks/jwks.json",
+          "keys_to_sign": [
+            "access_token",
+            "refresh_token"
+          ],
+          "kid": "8fWd4L_a1cV3-do8jKZuRurYVgwHrLqorv8gQpcGo1s",
+          "disable_jwk_security": true
+        }
+      }
+    }
+  ],
+  "extra_config": {}
+}

@@ -1,0 +1,16 @@
+{
+  "name": "api-gateway",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/api-gateway/src",
+  "projectType": "application",
+  "tags": [],
+  "targets": {
+    "generate-jwk": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "apps/api-gateway",
+        "command": "node ./tools/jwk-generator.js"
+      }
+    }
+  }
+}
