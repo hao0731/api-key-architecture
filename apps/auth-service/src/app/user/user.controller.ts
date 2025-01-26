@@ -1,4 +1,12 @@
-import { Body, Controller, Post, UnauthorizedException } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  NotFoundException,
+  Param,
+  Post,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { concatMap, iif, map, Observable, of, throwError } from 'rxjs';
 import { CreatedUser } from '@todoapp/user/domain';
 import { UserService } from './user.service';
@@ -11,6 +19,18 @@ export class UserController {
   @Post()
   createUser(@Body() dto: CreateUserDto): Observable<CreatedUser> {
     return this.userService.createUser(dto).pipe(map((user) => ({ user })));
+  }
+
+  @Get(':id')
+  getUserById(@Param('id') id: string) {
+    return this.userService.getUserById(id).pipe(
+      concatMap((doc) => {
+        if (!doc) {
+          return throwError(() => new NotFoundException('User not found'));
+        }
+        return of(this.userService.transformToUser(doc));
+      })
+    );
   }
 
   @Post('login')

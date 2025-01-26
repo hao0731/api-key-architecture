@@ -19,6 +19,10 @@ export class UserService {
       .pipe(map((doc) => this.transformToUser(doc)));
   }
 
+  getUserById(id: string) {
+    return this.userRepository.findById(id);
+  }
+
   getUserByUsername(username: string) {
     return this.userRepository.findByUsername(username);
   }
@@ -28,7 +32,6 @@ export class UserService {
   }
 
   generateLoggedInInformation(user: User): UserLoggedIn {
-    const issueDate = new Date();
     const expireDate = new Date(new Date().setHours(new Date().getHours() + 1));
     return {
       access_token: {
@@ -36,7 +39,6 @@ export class UserService {
         aud: this.tokenConfig.audience,
         sub: user.id,
         jti: crypto.randomUUID(),
-        iat: issueDate.valueOf(),
         exp: expireDate.valueOf(),
       },
       refresh_token: {
@@ -44,7 +46,6 @@ export class UserService {
         aud: this.tokenConfig.audience,
         sub: user.id,
         jti: crypto.randomUUID(),
-        iat: issueDate.valueOf(),
         exp: expireDate.valueOf(),
       },
       exp: expireDate.valueOf(),

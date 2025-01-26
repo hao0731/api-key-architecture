@@ -35,4 +35,8 @@ export class UserRepository {
   findByUsername(username: Username): Observable<UserDocument | null> {
     return defer(() => this.userModel.findOne({ username }).exec());
   }
+
+  findById(id: string): Observable<UserDocument | null> {
+    return defer(() => this.userModel.findById(id).exec());
+  }
 }
