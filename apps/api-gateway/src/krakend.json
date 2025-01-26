@@ -24,6 +24,25 @@
           "disable_jwk_security": true
         }
       }
+    },
+    {
+      "endpoint": "/users/{userId}",
+      "method": "GET",
+      "backend": [
+        {
+          "url_pattern": "/api/users/{userId}",
+          "host": ["http://auth-service:3333"],
+          "method": "GET"
+        }
+      ],
+      "extra_config": {
+        "auth/validator": {
+          "alg": "RS256",
+          "jwk_local_path": "./assets/jwks/public.json",
+          "disable_jwk_security": true,
+          "operation_debug": true
+        }
+      }
     }
   ],
   "extra_config": {}

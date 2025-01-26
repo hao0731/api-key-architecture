@@ -45,4 +45,5 @@ Thumbs.db
 .env
 
 # JWT
-jwks.json
+apps/api-gateway/src/assets/jwks/jwks.json
+apps/api-gateway/src/assets/jwks/public.json
