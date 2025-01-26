@@ -15,6 +15,7 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
+      "@todoapp/permission/domain": ["libs/permission/domain/src/index.ts"],
       "@todoapp/user/domain": ["libs/user/domain/src/index.ts"]
     }
   },

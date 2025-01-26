@@ -1,0 +1,9 @@
+{
+  "name": "permission-domain",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/permission/domain/src",
+  "projectType": "library",
+  "tags": ["type:domain", "scope:permission"],
+  "// targets": "to see all targets run: nx show project permission-domain --web",
+  "targets": {}
+}
