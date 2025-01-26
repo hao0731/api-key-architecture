@@ -3,6 +3,22 @@
   "version": 3,
   "endpoints": [
     {
+      "endpoint": "/users/signup",
+      "method": "POST",
+      "backend": [
+        {
+          "url_pattern": "/api/users",
+          "host": ["http://auth-service:3333"],
+          "method": "POST",
+          "extra_config": {
+            "backend/http": {
+              "return_error_details": "auth-service-a"
+            }
+          }
+        }
+      ]
+    },
+    {
       "endpoint": "/users/login",
       "method": "POST",
       "backend": [
