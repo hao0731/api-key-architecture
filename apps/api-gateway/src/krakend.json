@@ -59,6 +59,34 @@
           "operation_debug": true
         }
       }
+    },
+    {
+      "endpoint": "/api-keys",
+      "method": "POST",
+      "input_headers": ["x-user", "Content-Type"],
+      "backend": [
+        {
+          "url_pattern": "/api/api-keys",
+          "host": ["http://auth-service:3333"],
+          "method": "POST",
+          "extra_config": {
+            "backend/http": {
+              "return_error_details": "auth-service-a"
+            }
+          }
+        }
+      ],
+      "extra_config": {
+        "auth/validator": {
+          "alg": "RS256",
+          "jwk_local_path": "./assets/jwks/public.json",
+          "disable_jwk_security": true,
+          "operation_debug": true,
+          "propagate_claims": [
+            ["sub", "x-user"]
+          ]
+        }
+      }
     }
   ],
   "extra_config": {}
