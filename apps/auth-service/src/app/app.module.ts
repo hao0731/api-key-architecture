@@ -5,6 +5,7 @@ import { ConfigModule } from '@nestjs/config';
 import { LoggerModule } from 'nestjs-pino';
 import { MongoConfig, mongoConfig, tokenConfig } from './config';
 import { UserModule } from './user';
+import { ApiKeyModule } from './api-key';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { UserModule } from './user';
       inject: [mongoConfig.KEY],
     }),
     UserModule,
+    ApiKeyModule,
   ],
   providers: [
     {

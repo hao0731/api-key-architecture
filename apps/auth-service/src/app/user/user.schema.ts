@@ -14,7 +14,10 @@ import {
 } from '@todoapp/user/domain';
 import { isEmail } from 'class-validator';
 
-export type UserDocument = HydratedDocument<User>;
+export type UserDocument = HydratedDocument<User> & {
+  updatedAt: Date;
+  createdAt: Date;
+};
 export type UserModel = Model<UserDocument>;
 
 @Schema({
