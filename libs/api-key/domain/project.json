@@ -1,0 +1,9 @@
+{
+  "name": "api-key-domain",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/api-key/domain/src",
+  "projectType": "library",
+  "tags": ["type:domain", "scope:api-key"],
+  "// targets": "to see all targets run: nx show project api-key-domain --web",
+  "targets": {}
+}
