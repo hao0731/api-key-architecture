@@ -33,22 +33,23 @@ export class UserService {
 
   generateLoggedInInformation(user: User): UserLoggedIn {
     const expireDate = new Date(new Date().setHours(new Date().getHours() + 1));
+    const expiration = Math.floor(expireDate.getTime() / 1000);
     return {
       access_token: {
         iss: this.tokenConfig.issuer,
         aud: this.tokenConfig.audience,
         sub: user.id,
         jti: crypto.randomUUID(),
-        exp: expireDate.valueOf(),
+        exp: expiration,
       },
       refresh_token: {
         iss: this.tokenConfig.issuer,
         aud: this.tokenConfig.audience,
         sub: user.id,
         jti: crypto.randomUUID(),
-        exp: expireDate.valueOf(),
+        exp: expiration,
       },
-      exp: expireDate.valueOf(),
+      exp: expiration,
     };
   }
 
