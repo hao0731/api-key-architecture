@@ -5,19 +5,5 @@
   "projectType": "application",
   "tags": [],
   "targets": {
-    "generate-jwk": {
-      "executor": "nx:run-commands",
-      "options": {
-        "cwd": "apps/api-gateway",
-        "command": "node ./tools/jwk-generator.js"
-      }
-    },
-    "generate-jwk-public": {
-      "executor": "nx:run-commands",
-      "options": {
-        "cwd": "apps/api-gateway",
-        "command": "node ./tools/jwk-public-key.js"
-      }
-    }
   }
 }

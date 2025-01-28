@@ -14,11 +14,11 @@ services:
       - ./apps/auth-service/.env
     depends_on:
       - mongo
-  api-gateway:
+  backend-for-frontend:
     image: devopsfaith/krakend:latest
     command: run -dc /etc/krakend/krakend.json
-    container_name: api-gateway
+    container_name: backend-for-frontend
     ports:
       - "8080:8080"
     volumes:
-      - ./apps/api-gateway/src:/etc/krakend
+      - ./apps/backend-for-frontend/src:/etc/krakend

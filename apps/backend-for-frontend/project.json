@@ -1,0 +1,23 @@
+{
+  "name": "backend-for-frontend",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/backend-for-frontend/src",
+  "projectType": "application",
+  "tags": [],
+  "targets": {
+    "generate-jwk": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "apps/backend-for-frontend",
+        "command": "node ./tools/jwk-generator.js"
+      }
+    },
+    "generate-jwk-public": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "apps/backend-for-frontend",
+        "command": "node ./tools/jwk-public-key.js"
+      }
+    }
+  }
+}
