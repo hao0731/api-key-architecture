@@ -6,4 +6,5 @@ export interface CreatedApiKey {
 
 export interface ValidateApiKeyResult {
   isValid: boolean;
+  apiKey: ApiKey | null;
 }

@@ -1,11 +1,12 @@
 import { Injectable } from '@nestjs/common';
-import { concatMap, defer, map, of } from 'rxjs';
+import { concatMap, defer, map, Observable, of } from 'rxjs';
 import { compare as bcryptCompare } from 'bcrypt';
 import {
   ApiKey,
   captureKeyHint,
   CreateApiKey,
   RawApiKey,
+  ValidateApiKeyResult,
 } from '@todoapp/api-key/domain';
 import { ApiKeyRepository } from './api-key.repository';
 import { ApiKeyDocument } from './api-key.schema';
@@ -23,21 +24,26 @@ export class ApiKeyService {
     );
   }
 
-  validateApiKey(apiKey: RawApiKey) {
+  validateApiKey(apiKey: RawApiKey): Observable<ValidateApiKeyResult> {
     const keyHint = captureKeyHint(apiKey);
     return this.apiKeyRepository.findByKeyHint(keyHint).pipe(
       concatMap((document) => {
         if (!document) {
-          return of(false);
+          return of({ isValid: false, apiKey: null });
         }
 
         if (
           (document.expireDate?.getTime() ?? Infinity) < new Date().getTime()
         ) {
-          return of(false);
+          return of({ isValid: false, apiKey: null });
         }
 
-        return defer(() => bcryptCompare(apiKey, document.key));
+        return defer(() => bcryptCompare(apiKey, document.key)).pipe(
+          map((isValid) => ({
+            isValid,
+            apiKey: this.transformToApiKey(document),
+          }))
+        );
       })
     );
   }
