@@ -25,8 +25,6 @@ export class ApiKeyController {
   validateApiKey(
     @Body() dto: ValidateApiKeyDto
   ): Observable<ValidateApiKeyResult> {
-    return this.apiKeyService
-      .validateApiKey(dto.apiKey)
-      .pipe(map((isValid) => ({ isValid })));
+    return this.apiKeyService.validateApiKey(dto.apiKey);
   }
 }
