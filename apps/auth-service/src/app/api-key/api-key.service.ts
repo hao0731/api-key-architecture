@@ -1,8 +1,14 @@
 import { Injectable } from '@nestjs/common';
-import { ApiKey, CreateApiKey } from '@todoapp/api-key/domain';
+import { concatMap, defer, map, of } from 'rxjs';
+import { compare as bcryptCompare } from 'bcrypt';
+import {
+  ApiKey,
+  captureKeyHint,
+  CreateApiKey,
+  RawApiKey,
+} from '@todoapp/api-key/domain';
 import { ApiKeyRepository } from './api-key.repository';
 import { ApiKeyDocument } from './api-key.schema';
-import { map } from 'rxjs';
 
 @Injectable()
 export class ApiKeyService {
@@ -14,6 +20,25 @@ export class ApiKeyService {
         rawApiKey,
         apiKey: this.transformToApiKey(document),
       }))
+    );
+  }
+
+  validateApiKey(apiKey: RawApiKey) {
+    const keyHint = captureKeyHint(apiKey);
+    return this.apiKeyRepository.findByKeyHint(keyHint).pipe(
+      concatMap((document) => {
+        if (!document) {
+          return of(false);
+        }
+
+        if (
+          (document.expireDate?.getTime() ?? Infinity) < new Date().getTime()
+        ) {
+          return of(false);
+        }
+
+        return defer(() => bcryptCompare(apiKey, document.key));
+      })
     );
   }
 

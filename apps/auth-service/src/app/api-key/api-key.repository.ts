@@ -3,6 +3,7 @@ import { Observable, concatMap, defer, iif, map, throwError } from 'rxjs';
 import { hash as bcryptHash } from 'bcrypt';
 import {
   API_KEY_COUNT_LIMIT,
+  ApiKeyHint,
   captureKeyHint,
   CreateApiKey,
   RawApiKey,
@@ -58,5 +59,9 @@ export class ApiKeyRepository {
         )
       )
     );
+  }
+
+  findByKeyHint(keyHint: ApiKeyHint): Observable<ApiKeyDocument | null> {
+    return defer(() => this.apiKeyModel.findOne({ keyHint }).exec());
   }
 }

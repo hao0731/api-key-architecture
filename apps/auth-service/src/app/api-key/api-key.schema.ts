@@ -58,7 +58,7 @@ export class ApiKey {
   @Prop({
     type: Date,
   })
-  expireDate: Date;
+  expireDate?: Date;
 }
 
 export const ApiKeySchema = SchemaFactory.createForClass(ApiKey);

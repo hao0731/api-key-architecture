@@ -1,9 +1,9 @@
 import { Body, Controller, Headers, Post } from '@nestjs/common';
+import { map, Observable } from 'rxjs';
+import { CreatedApiKey, ValidateApiKeyResult } from '@todoapp/api-key/domain';
 import { UserId } from '@todoapp/user/domain';
 import { ApiKeyService } from './api-key.service';
-import { CreateApiKeyDto } from './dtos';
-import { map, Observable } from 'rxjs';
-import { CreatedApiKey } from '@todoapp/api-key/domain';
+import { CreateApiKeyDto, ValidateApiKeyDto } from './dtos';
 
 @Controller('api-keys')
 export class ApiKeyController {
@@ -19,5 +19,14 @@ export class ApiKeyController {
       .pipe(
         map(({ apiKey, rawApiKey }) => ({ apiKey: { ...apiKey, rawApiKey } }))
       );
+  }
+
+  @Post('validate')
+  validateApiKey(
+    @Body() dto: ValidateApiKeyDto
+  ): Observable<ValidateApiKeyResult> {
+    return this.apiKeyService
+      .validateApiKey(dto.apiKey)
+      .pipe(map((isValid) => ({ isValid })));
   }
 }
