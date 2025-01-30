@@ -15,10 +15,18 @@ services:
     depends_on:
       - mongo
   backend-for-frontend:
-    image: devopsfaith/krakend:latest
+    image: devopsfaith/krakend:2.9.1
     command: run -dc /etc/krakend/krakend.json
     container_name: backend-for-frontend
     ports:
       - "8080:8080"
     volumes:
       - ./apps/backend-for-frontend/src:/etc/krakend
+  api-gateway:
+    image: devopsfaith/krakend:2.9.1
+    command: run -dc /etc/krakend/krakend.json
+    container_name: api-gateway
+    ports:
+      - "8081:8080"
+    volumes:
+      - ./apps/api-gateway/src:/etc/krakend

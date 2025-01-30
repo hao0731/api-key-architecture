@@ -1,7 +1,33 @@
 {
   "$schema": "https://www.krakend.io/schema/v2.9/krakend.json",
   "version": 3,
+  "plugin": {
+    "pattern": ".so",
+    "folder": "./plugins/api-key-validator"
+  },
   "endpoints": [
+    {
+      "endpoint": "/api/v1/users/{userId}",
+      "method": "GET",
+      "input_headers": ["x-user"],
+      "backend": [
+        {
+          "url_pattern": "/api/users/{userId}",
+          "host": ["http://auth-service:3333"],
+          "method": "GET"
+        }
+      ],
+      "extra_config": {}
+    }
   ],
-  "extra_config": {}
+  "extra_config": {
+    "plugin/http-server": {
+      "name": ["api-key-validator"],
+      "api-key-validator": {
+        "input_header_name": "X-API-KEY",
+        "output_header_name": "x-user",
+        "apikey_validator_url": "http://auth-service:3333/api/api-keys/validate"
+      }
+    }
+  }
 }
