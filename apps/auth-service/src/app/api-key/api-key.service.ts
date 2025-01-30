@@ -53,6 +53,7 @@ export class ApiKeyService {
       id: document._id.toString(),
       keyHint: document.keyHint,
       roles: document.roles,
+      ownerId: document.ownerId.toString(),
       expireDate: document.expireDate,
       createdAt: document.createdAt,
       updatedAt: document.updatedAt,
