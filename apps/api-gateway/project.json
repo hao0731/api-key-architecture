@@ -5,5 +5,19 @@
   "projectType": "application",
   "tags": [],
   "targets": {
+    "build-plugin": {
+      "executor": "nx:run-commands",
+      "configurations": {
+        "api-key-validator": {
+          "cwd": "apps/api-gateway",
+          "commands": [
+            "docker run -it --rm -v \"$PWD:/app\" -w /app/src/plugins/api-key-validator krakend/builder:2.9.1 go build -buildmode=plugin -o api-key-validator.so .",
+            "mkdir -p dist/plugins",
+            "mv ./src/plugins/api-key-validator/api-key-validator.so ./dist/plugins"
+          ],
+          "parallel": false
+        }
+      }
+    }
   }
 }

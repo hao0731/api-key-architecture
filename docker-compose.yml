@@ -29,4 +29,5 @@ services:
     ports:
       - "8081:8080"
     volumes:
-      - ./apps/api-gateway/src:/etc/krakend
+      - ./apps/api-gateway/src/krakend.json:/etc/krakend/krakend.json
+      - ./apps/api-gateway/dist/plugins:/etc/krakend/plugins
