@@ -1,0 +1,7 @@
+p, todo:reader, todo, read
+p, todo:writer, todo, write
+p, user:reader, user, read
+
+g, todo:writer, todo:reader
+g, admin, todo:writer
+g, admin, user:reader

@@ -33,6 +33,13 @@ func (validator Validator) GetApiKeyOwner() (string, error) {
 	return validator.apiKeyInfo.OwnerId, nil
 }
 
+func (validator Validator) GetRoles() ([]string, error) {
+	if validator.apiKeyInfo == nil {
+		return []string{}, errors.New("please execute authenticate method first")
+	}
+	return validator.apiKeyInfo.Roles, nil
+}
+
 func New(apiEndpoint string) *Validator {
 	provider := Provider{ApiEndpoint: apiEndpoint}
 	validator := Validator{}

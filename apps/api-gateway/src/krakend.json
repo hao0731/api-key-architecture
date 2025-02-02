@@ -9,7 +9,7 @@
     {
       "endpoint": "/api/v1/users/{userId}",
       "method": "GET",
-      "input_headers": ["x-user"],
+      "input_headers": ["x-user", "X-User-Roles"],
       "backend": [
         {
           "url_pattern": "/api/users/{userId}",
@@ -17,7 +17,15 @@
           "method": "GET"
         }
       ],
-      "extra_config": {}
+      "extra_config": {
+        "plugin/req-resp-modifier": {
+          "name": ["api-key-validator"],
+          "api-key-validator": {
+            "resource": "user",
+            "action": "read"
+          }
+        }
+      }
     }
   ],
   "extra_config": {

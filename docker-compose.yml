@@ -31,3 +31,4 @@ services:
     volumes:
       - ./apps/api-gateway/src/krakend.json:/etc/krakend/krakend.json
       - ./apps/api-gateway/dist/plugins:/etc/krakend/plugins
+      - ./apps/api-gateway/src/assets:/etc/krakend/assets
