@@ -1,17 +1,13 @@
 package main
 
 import (
+	"api-key-validator/authz"
 	"api-key-validator/utils"
 	"api-key-validator/validator"
 	"context"
 	"errors"
 	"fmt"
-	"io"
 	"net/http"
-	"net/url"
-	"strings"
-
-	"github.com/casbin/casbin/v2"
 )
 
 // pluginName is the plugin name
@@ -21,8 +17,7 @@ var pluginName = "api-key-validator"
 var HandlerRegisterer = registerer(pluginName)
 var ModifierRegisterer = registerer(pluginName)
 
-var enforcer *casbin.Enforcer
-var roleHeader = "X-User-Roles"
+var authorizer *authz.Authorizer
 
 type registerer string
 
@@ -33,14 +28,14 @@ func (r registerer) RegisterHandlers(f func(
 	f(string(r), r.registerHandlers)
 }
 
-func (r registerer) registerCasbinEnforcer() error {
-	instance, err := casbin.NewEnforcer("./assets/casbin/model.conf", "./assets/casbin/policy.csv")
+func (r registerer) registerAuthorizer() error {
+	instance, err := authz.New()
 
 	if err != nil {
 		return err
 	}
 
-	enforcer = instance
+	authorizer = instance
 
 	return nil
 }
@@ -51,11 +46,11 @@ func (r registerer) registerHandlers(ctx context.Context, extra map[string]inter
 		return h, errors.New("configuration not found")
 	}
 
-	err := r.registerCasbinEnforcer()
+	err := r.registerAuthorizer()
 
 	if err != nil {
 		logger.Error(err)
-		return h, errors.New("casbin init failed")
+		return h, errors.New("authorizer init failed")
 	}
 
 	inputHeaderName, _ := config["input_header_name"].(string)
@@ -88,7 +83,7 @@ func (r registerer) registerHandlers(ctx context.Context, extra map[string]inter
 		}
 
 		roles, _ := authValidator.GetRoles()
-		req.Header.Set(roleHeader, strings.Join(roles, ","))
+		authz.SetRolesHeader(&req.Header, roles)
 
 		owner, _ := authValidator.GetApiKeyOwner()
 
@@ -110,64 +105,28 @@ func (r registerer) RegisterModifiers(f func(
 	f(string(r), r.authorizeFactory, true, false)
 }
 
-// RequestWrapper is an interface for passing proxy request between the krakend pipe
-// and the loaded plugins
-type RequestWrapper interface {
-	Params() map[string]string
-	Headers() map[string][]string
-	Body() io.ReadCloser
-	Method() string
-	URL() *url.URL
-	Query() url.Values
-	Path() string
-}
-
 func (r registerer) authorizeFactory(extra map[string]interface{}) func(interface{}) (interface{}, error) {
 	config := extra[pluginName].(map[string]interface{})
 	resource, _ := config["resource"].(string)
 	action, _ := config["action"].(string)
 
 	return func(input interface{}) (interface{}, error) {
-		req, ok := input.(RequestWrapper)
+		req, ok := input.(utils.RequestWrapper)
 
 		if !ok {
-			return nil, errors.New("unknown request type")
+			return nil, utils.NewResponseError(500, "This request is an unknown type.")
 		}
 
-		headers := req.Headers()
-		roleHeaders, ok := headers["X-User-Roles"]
+		roles, err := authz.GetRolesHeader(req)
 
-		if !ok {
-			return nil, errors.New("cannot identify roles")
+		if err != nil {
+			return nil, utils.NewResponseError(500, "The server cannot get the roles, please try again.")
 		}
 
-		roleString := roleHeaders[0]
-		roles := strings.Split(roleString, ",")
-
-		rawInputs := utils.ArrayMap(roles, func(role string) []string {
-			return []string{role, resource, action}
-		})
-		inputs := make([][]interface{}, len(rawInputs))
-		for i := range rawInputs {
-			input := make([]interface{}, len(rawInputs[i]))
-			for j := range rawInputs[i] {
-				input[j] = rawInputs[i][j]
-			}
-			inputs[i] = input
-		}
-
-		results, _ := enforcer.BatchEnforce(inputs)
-
-		authorized := false
-		for _, result := range results {
-			if result {
-				authorized = true
-				break
-			}
-		}
+		authorized, _ := authorizer.Authorize(roles, resource, action)
 
 		if !authorized {
-			return nil, HTTPResponseError{Code: 403, Msg: "Forbidden"}
+			return nil, utils.NewResponseError(403, "You don't have the permission to access resource.")
 		}
 
 		return input, nil
@@ -177,48 +136,13 @@ func (r registerer) authorizeFactory(extra map[string]interface{}) func(interfac
 func main() {}
 
 // This logger is replaced by the RegisterLogger method to load the one from KrakenD
-var logger Logger = noopLogger{}
+var logger utils.Logger = utils.NoopLogger{}
 
 func (registerer) RegisterLogger(v interface{}) {
-	l, ok := v.(Logger)
+	l, ok := v.(utils.Logger)
 	if !ok {
 		return
 	}
 	logger = l
 	logger.Debug(fmt.Sprintf("[PLUGIN: %s] Logger loaded", HandlerRegisterer))
-}
-
-type Logger interface {
-	Debug(v ...interface{})
-	Info(v ...interface{})
-	Warning(v ...interface{})
-	Error(v ...interface{})
-	Critical(v ...interface{})
-	Fatal(v ...interface{})
-}
-
-// Empty logger implementation
-type noopLogger struct{}
-
-func (n noopLogger) Debug(_ ...interface{})    {}
-func (n noopLogger) Info(_ ...interface{})     {}
-func (n noopLogger) Warning(_ ...interface{})  {}
-func (n noopLogger) Error(_ ...interface{})    {}
-func (n noopLogger) Critical(_ ...interface{}) {}
-func (n noopLogger) Fatal(_ ...interface{})    {}
-
-// HTTPResponseError is the error to be returned by the ErrorHTTPStatusHandler
-type HTTPResponseError struct {
-	Code int    `json:"http_status_code"`
-	Msg  string `json:"http_body,omitempty"`
-}
-
-// Error returns the error message
-func (r HTTPResponseError) Error() string {
-	return r.Msg
-}
-
-// StatusCode returns the status code returned by the backend
-func (r HTTPResponseError) StatusCode() int {
-	return r.Code
 }

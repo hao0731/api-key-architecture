@@ -29,6 +29,9 @@
     }
   ],
   "extra_config": {
+    "router": {
+      "return_error_msg": true
+    },
     "plugin/http-server": {
       "name": ["api-key-validator"],
       "api-key-validator": {
