@@ -1,4 +1,4 @@
-package validator
+package authn
 
 import (
 	"bytes"
@@ -7,16 +7,11 @@ import (
 	"net/http"
 )
 
-type ProviderApi interface {
-	Validate(apiKey string) ValidateApiKeyResult
-}
-
 type Provider struct {
-	ProviderApi
 	ApiEndpoint string
 }
 
-func (provider Provider) Validate(apiKey string) (ValidateApiKeyResult, error) {
+func (provider *Provider) Validate(apiKey string) (ValidateApiKeyResult, error) {
 	var result ValidateApiKeyResult
 	payload, _ := json.Marshal(map[string]string{"apiKey": apiKey})
 	res, requestError := http.Post(provider.ApiEndpoint, "application/json", bytes.NewReader(payload))

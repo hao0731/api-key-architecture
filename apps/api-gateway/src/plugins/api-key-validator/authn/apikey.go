@@ -1,4 +1,4 @@
-package validator
+package authn
 
 type ApiKey struct {
 	Roles   []string `json: roles`

@@ -1,9 +1,9 @@
 package main
 
 import (
+	"api-key-validator/authn"
 	"api-key-validator/authz"
 	"api-key-validator/utils"
-	"api-key-validator/validator"
 	"context"
 	"errors"
 	"fmt"
@@ -67,8 +67,8 @@ func (r registerer) registerHandlers(ctx context.Context, extra map[string]inter
 			return
 		}
 
-		authValidator := validator.New(apiKeyValidatorUrl)
-		authenticated, err := authValidator.Authenticate(apiKey)
+		authenticator := authn.New(apiKeyValidatorUrl)
+		authenticated, err := authenticator.Authenticate(apiKey)
 
 		if err != nil {
 			logger.Error("Authenticate failed.", err)
@@ -82,10 +82,10 @@ func (r registerer) registerHandlers(ctx context.Context, extra map[string]inter
 			return
 		}
 
-		roles, _ := authValidator.GetRoles()
+		roles, _ := authenticator.GetRoles()
 		authz.SetRolesHeader(&req.Header, roles)
 
-		owner, _ := authValidator.GetApiKeyOwner()
+		owner, _ := authenticator.GetApiKeyOwner()
 
 		req.Header.Set(outputHeaderName, owner)
 		h.ServeHTTP(w, req)
@@ -114,19 +114,19 @@ func (r registerer) authorizeFactory(extra map[string]interface{}) func(interfac
 		req, ok := input.(utils.RequestWrapper)
 
 		if !ok {
-			return nil, utils.NewResponseError(500, "This request is an unknown type.")
+			return nil, utils.NewResponseError(http.StatusInternalServerError, "This request is an unknown type.")
 		}
 
 		roles, err := authz.GetRolesHeader(req)
 
 		if err != nil {
-			return nil, utils.NewResponseError(500, "The server cannot get the roles, please try again.")
+			return nil, utils.NewResponseError(http.StatusInternalServerError, "The server cannot get the roles, please try again.")
 		}
 
 		authorized, _ := authorizer.Authorize(roles, resource, action)
 
 		if !authorized {
-			return nil, utils.NewResponseError(403, "You don't have the permission to access resource.")
+			return nil, utils.NewResponseError(http.StatusForbidden, "You don't have the permission to access resource.")
 		}
 
 		return input, nil
