@@ -17,6 +17,7 @@
     "paths": {
       "@todoapp/api-key/domain": ["libs/api-key/domain/src/index.ts"],
       "@todoapp/permission/domain": ["libs/permission/domain/src/index.ts"],
+      "@todoapp/todo/domain": ["libs/todo/domain/src/index.ts"],
       "@todoapp/user/domain": ["libs/user/domain/src/index.ts"]
     }
   },

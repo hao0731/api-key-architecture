@@ -1,0 +1,9 @@
+{
+  "name": "todo-domain",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/todo/domain/src",
+  "projectType": "library",
+  "tags": ["type:domain", "scope:todo"],
+  "// targets": "to see all targets run: nx show project todo-domain --web",
+  "targets": {}
+}
