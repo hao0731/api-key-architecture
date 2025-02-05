@@ -58,11 +58,11 @@ func (r registerer) registerHandlers(ctx context.Context, extra map[string]inter
 	apiKeyValidatorUrl, _ := config["apikey_validator_url"].(string)
 
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		responseHelper := utils.NewHttpResponseHelper(w)
 		apiKey := req.Header.Get(inputHeaderName)
 
 		if apiKey == "" {
-			w.WriteHeader(http.StatusUnauthorized)
-			w.Write([]byte("Unauthorized"))
+			responseHelper.Message(http.StatusUnauthorized, "Your API Key is invalid.")
 			logger.Info("Unauthorized request")
 			return
 		}
@@ -71,13 +71,13 @@ func (r registerer) registerHandlers(ctx context.Context, extra map[string]inter
 		authenticated, err := authenticator.Authenticate(apiKey)
 
 		if err != nil {
+			responseHelper.Message(http.StatusInternalServerError, "Oops! authentication flow went wrong, please try again.")
 			logger.Error("Authenticate failed.", err)
 			return
 		}
 
 		if !authenticated {
-			w.WriteHeader(http.StatusUnauthorized)
-			w.Write([]byte("Unauthorized"))
+			responseHelper.Message(http.StatusUnauthorized, "Your API Key is invalid.")
 			logger.Info("Unauthorized request")
 			return
 		}
