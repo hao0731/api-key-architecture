@@ -61,6 +61,120 @@
       }
     },
     {
+      "endpoint": "/todos",
+      "method": "POST",
+      "input_headers": ["x-user"],
+      "backend": [
+        {
+          "url_pattern": "/api/todos",
+          "host": ["http://todo-service:3333"],
+          "method": "POST",
+          "extra_config": {
+            "backend/http": {
+              "return_error_details": "todo-service-a"
+            }
+          }
+        }
+      ],
+      "extra_config": {
+        "auth/validator": {
+          "alg": "RS256",
+          "jwk_local_path": "./assets/jwks/public.json",
+          "disable_jwk_security": true,
+          "operation_debug": true,
+          "propagate_claims": [
+            ["sub", "x-user"]
+          ]
+        }
+      }
+    },
+    {
+      "endpoint": "/todos/{todoId}",
+      "method": "GET",
+      "input_headers": ["x-user"],
+      "backend": [
+        {
+          "url_pattern": "/api/todos/{todoId}",
+          "host": ["http://todo-service:3333"],
+          "method": "GET",
+          "extra_config": {
+            "backend/http": {
+              "return_error_details": "todo-service-a"
+            }
+          }
+        }
+      ],
+      "extra_config": {
+        "auth/validator": {
+          "alg": "RS256",
+          "jwk_local_path": "./assets/jwks/public.json",
+          "disable_jwk_security": true,
+          "operation_debug": true,
+          "propagate_claims": [
+            ["sub", "x-user"]
+          ]
+        }
+      }
+    },
+    {
+      "endpoint": "/todos/{todoId}",
+      "method": "PATCH",
+      "input_headers": ["x-user", "Content-Type"],
+      "backend": [
+        {
+          "url_pattern": "/api/todos/{todoId}",
+          "host": ["http://todo-service:3333"],
+          "method": "PATCH",
+          "extra_config": {
+            "backend/http": {
+              "return_error_details": "todo-service-a"
+            }
+          }
+        }
+      ],
+      "extra_config": {
+        "auth/validator": {
+          "alg": "RS256",
+          "jwk_local_path": "./assets/jwks/public.json",
+          "disable_jwk_security": true,
+          "operation_debug": true,
+          "propagate_claims": [
+            ["sub", "x-user"]
+          ]
+        }
+      }
+    },
+    {
+      "endpoint": "/todos/{todoId}",
+      "method": "DELETE",
+      "input_headers": ["x-user", "Content-Type"],
+      "output_encoding": "no-op",
+      "backend": [
+        {
+          "url_pattern": "/api/todos/{todoId}",
+          "host": ["http://todo-service:3333"],
+          "method": "DELETE",
+          "encoding": "no-op",
+          "extra_config": {
+            "backend/http": {
+              "return_error_details": "todo-service-a"
+            }
+          }
+        }
+      ],
+      "extra_config": {
+        "auth/validator": {
+          "alg": "RS256",
+          "jwk_local_path": "./assets/jwks/public.json",
+          "disable_jwk_security": true,
+          "operation_debug": true,
+          "propagate_claims": [
+            ["sub", "x-user"]
+          ]
+        }
+      }
+    },
+    {
       "endpoint": "/api-keys",
       "method": "POST",
       "input_headers": ["x-user", "Content-Type"],
