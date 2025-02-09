@@ -1,16 +1,18 @@
 import {
   Body,
   Controller,
+  ForbiddenException,
   Get,
-  NotFoundException,
   Param,
   Post,
   UnauthorizedException,
+  UseGuards,
 } from '@nestjs/common';
 import { concatMap, iif, map, Observable, of, throwError } from 'rxjs';
-import { CreatedUser } from '@todoapp/user/domain';
+import { CreatedUser, GotUser } from '@todoapp/user/domain';
 import { UserService } from './user.service';
 import { CreateUserDto, UserLoginDto } from './dtos';
+import { AuthGuard, User, whenResourceExist } from '@todoapp/infra';
 
 @Controller('users')
 export class UserController {
@@ -21,14 +23,20 @@ export class UserController {
     return this.userService.createUser(dto).pipe(map((user) => ({ user })));
   }
 
+  @UseGuards(AuthGuard)
   @Get(':id')
-  getUserById(@Param('id') id: string) {
+  getUserById(
+    @User() userId: string,
+    @Param('id') id: string
+  ): Observable<GotUser> {
+    if (userId !== id) {
+      throw new ForbiddenException('You only can get your user information.');
+    }
     return this.userService.getUserById(id).pipe(
-      concatMap((doc) => {
-        if (!doc) {
-          return throwError(() => new NotFoundException('User not found'));
-        }
-        return of(this.userService.transformToUser(doc));
+      whenResourceExist({
+        errorMessageFn: () =>
+          `The User with id ${id} does not exist. Please verify whether the id is correct.`,
+        returnFn: (doc) => ({ user: this.userService.transformToUser(doc) }),
       })
     );
   }

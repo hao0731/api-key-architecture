@@ -4,6 +4,10 @@ export interface CreatedUser {
   user: User;
 }
 
+export interface GotUser {
+  user: User;
+}
+
 export interface UserLoggedIn {
   access_token: JWTContent;
   refresh_token: JWTContent;

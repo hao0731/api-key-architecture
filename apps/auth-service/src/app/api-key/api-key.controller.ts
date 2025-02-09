@@ -1,7 +1,8 @@
-import { Body, Controller, Headers, Post } from '@nestjs/common';
+import { Body, Controller, Post, UseGuards } from '@nestjs/common';
 import { map, Observable } from 'rxjs';
 import { CreatedApiKey, ValidateApiKeyResult } from '@todoapp/api-key/domain';
 import { UserId } from '@todoapp/user/domain';
+import { AuthGuard, User } from '@todoapp/infra';
 import { ApiKeyService } from './api-key.service';
 import { CreateApiKeyDto, ValidateApiKeyDto } from './dtos';
 
@@ -9,9 +10,10 @@ import { CreateApiKeyDto, ValidateApiKeyDto } from './dtos';
 export class ApiKeyController {
   constructor(private readonly apiKeyService: ApiKeyService) {}
 
+  @UseGuards(AuthGuard)
   @Post()
   createApiKey(
-    @Headers('x-user') userId: UserId,
+    @User() userId: UserId,
     @Body() dto: CreateApiKeyDto
   ): Observable<CreatedApiKey> {
     return this.apiKeyService
