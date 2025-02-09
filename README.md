@@ -10,8 +10,8 @@ architecture-beta
     service tododb(database)[Todo DB] in services
     service auth(server)[Auth Service] in services
     service authdb(database)[Auth DB] in services
-    service apigateway(logos:aws-api-gateway)[API Gateway] in services
-    service bff(logos:aws-api-gateway)[Backend For Frontend] in services
+    service apigateway(internet)[API Gateway] in services
+    service bff(internet)[Backend For Frontend] in services
 
     junction apigatewayToTodo
     junction bffToTodo
