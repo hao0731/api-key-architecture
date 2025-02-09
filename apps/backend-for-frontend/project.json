@@ -14,6 +14,7 @@
     },
     "generate-jwk-public": {
       "executor": "nx:run-commands",
+      "dependsOn": ["^generate-jwk"],
       "options": {
         "cwd": "apps/backend-for-frontend",
         "command": "node ./tools/jwk-public-key.js"
