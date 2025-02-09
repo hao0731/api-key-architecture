@@ -3,15 +3,18 @@ services:
   mongo:
     image: mongo:latest
     container_name: mongo
-    ports:
-      - "27017:27017"
   auth-service:
     image: auth-service:latest
     container_name: auth-service
-    ports:
-      - "3333:3333"
     env_file:
       - ./apps/auth-service/.env
+    depends_on:
+      - mongo
+  todo-service:
+    image: todo-service:latest
+    container_name: todo-service
+    env_file:
+      - ./apps/todo-service/.env
     depends_on:
       - mongo
   backend-for-frontend:

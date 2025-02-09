@@ -14,7 +14,12 @@
         {
           "url_pattern": "/api/users/{userId}",
           "host": ["http://auth-service:3333"],
-          "method": "GET"
+          "method": "GET",
+          "extra_config": {
+            "backend/http": {
+              "return_error_details": "auth-service-a"
+            }
+          }
         }
       ],
       "extra_config": {
@@ -23,6 +28,112 @@
           "api-key-validator": {
             "resource": "user",
             "action": "read"
+          }
+        }
+      }
+    },
+    {
+      "endpoint": "/api/v1/todos/{todoId}",
+      "method": "GET",
+      "input_headers": ["x-user", "X-User-Roles"],
+      "backend": [
+        {
+          "url_pattern": "/api/todos/{todoId}",
+          "host": ["http://todo-service:3333"],
+          "method": "GET",
+          "extra_config": {
+            "backend/http": {
+              "return_error_details": "todo-service-a"
+            }
+          }
+        }
+      ],
+      "extra_config": {
+        "plugin/req-resp-modifier": {
+          "name": ["api-key-validator"],
+          "api-key-validator": {
+            "resource": "todo",
+            "action": "read"
+          }
+        }
+      }
+    },
+    {
+      "endpoint": "/api/v1/todos",
+      "method": "POST",
+      "input_headers": ["x-user", "X-User-Roles", "Content-Type"],
+      "backend": [
+        {
+          "url_pattern": "/api/todos",
+          "host": ["http://todo-service:3333"],
+          "method": "POST",
+          "extra_config": {
+            "backend/http": {
+              "return_error_details": "todo-service-a"
+            }
+          }
+        }
+      ],
+      "extra_config": {
+        "plugin/req-resp-modifier": {
+          "name": ["api-key-validator"],
+          "api-key-validator": {
+            "resource": "todo",
+            "action": "write"
+          }
+        }
+      }
+    },
+    {
+      "endpoint": "/api/v1/todos/{todoId}",
+      "method": "PATCH",
+      "input_headers": ["x-user", "X-User-Roles", "Content-Type"],
+      "backend": [
+        {
+          "url_pattern": "/api/todos/{todoId}",
+          "host": ["http://todo-service:3333"],
+          "method": "PATCH",
+          "extra_config": {
+            "backend/http": {
+              "return_error_details": "todo-service-a"
+            }
+          }
+        }
+      ],
+      "extra_config": {
+        "plugin/req-resp-modifier": {
+          "name": ["api-key-validator"],
+          "api-key-validator": {
+            "resource": "todo",
+            "action": "write"
+          }
+        }
+      }
+    },
+    {
+      "endpoint": "/api/v1/todos/{todoId}",
+      "method": "DELETE",
+      "input_headers": ["x-user", "X-User-Roles", "Content-Type"],
+      "output_encoding": "no-op",
+      "backend": [
+        {
+          "url_pattern": "/api/todos/{todoId}",
+          "host": ["http://todo-service:3333"],
+          "method": "DELETE",
+          "encoding": "no-op",
+          "extra_config": {
+            "backend/http": {
+              "return_error_details": "todo-service-a"
+            }
+          }
+        }
+      ],
+      "extra_config": {
+        "plugin/req-resp-modifier": {
+          "name": ["api-key-validator"],
+          "api-key-validator": {
+            "resource": "todo",
+            "action": "write"
           }
         }
       }
